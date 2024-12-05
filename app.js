@@ -534,13 +534,13 @@ function saveAction(event) {
         disadvantages: currentAction ? currentAction.disadvantages : []
     };
 
-    if (actionIndex === '') {
-        // Aggiungi nuova azione
-        currentTurn.actions.push(actionData);
-    } else {
-        // Modifica azione esistente
-        currentTurn.actions[actionIndex] = actionData;
-    }
+    // if (actionIndex === '') {
+    //     // Aggiungi nuova azione
+    //     currentTurn.actions.push(actionData);
+    // } else {
+    //     // Modifica azione esistente
+    //     currentTurn.actions[actionIndex] = actionData;
+    // }
 
     renderTurns();
     actionModal.close();
@@ -559,10 +559,32 @@ function deleteAction(event) {
 
 function manageAdvantages(event) {
     const turnIndex = event.target.dataset.turnIndex;
-    const actionType = event.target.dataset.actionType;
-    currentAction = currentFaction.turns[turnIndex].actions.find(a => a.type === actionType);
-    renderAdvantagesDisadvantages();
-    advDisadvModal.showModal();
+    const actionIndex = event.target.dataset.actionIndex;
+
+    console.log('Gestione Vantaggi/Svantaggi per Turno:', turnIndex, 'Azione:', actionIndex);
+
+    // Verifica che le strutture dati siano definite
+    if (
+        currentFaction &&
+        currentFaction.turns &&
+        currentFaction.turns[turnIndex] &&
+        currentFaction.turns[turnIndex].actions &&
+        currentFaction.turns[turnIndex].actions[actionIndex]
+    ) {
+        currentAction = currentFaction.turns[turnIndex].actions[actionIndex];
+
+        // Assicuriamoci che currentAction sia definito
+        if (!currentAction) {
+            console.error('currentAction è undefined');
+            return;
+        }
+
+        renderAdvantagesDisadvantages();
+        advDisadvModal.showModal();
+    } else {
+        console.error('Impossibile trovare l\'azione specificata.');
+        alert('Errore: Azione non trovata o dati non validi.');
+    }
 }
 
 // Funzioni per gestire vantaggi e svantaggi
