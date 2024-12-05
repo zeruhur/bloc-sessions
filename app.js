@@ -427,36 +427,35 @@ function renderTurns() {
     }
 
     currentFaction.turns.forEach((turn, index) => {
-        // Assicurati che turn.actions sia un array
         turn.actions = turn.actions || [];
         if (!Array.isArray(turn.actions)) {
             turn.actions = Object.values(turn.actions);
         }
-
+    
         const turnCard = document.createElement('article');
         turnCard.classList.add('card');
+    
+        const actionsHTML = turn.actions.map((action, actionIndex) => `
+            <article class="card action-card">
+                <h4>${action.type === 'main' ? 'Azione Principale' : 'Azione del Leader'}</h4>
+                <p><strong>Risultato:</strong> ${action.result}</p>
+                <p><strong>Metodo:</strong> ${action.method}</p>
+                <p><strong>Risorse:</strong> ${action.resources.join(', ')}</p>
+                <button data-turn-index="${index}" data-action-index="${actionIndex}" class="edit-action-button">Modifica Azione</button>
+                <button data-turn-index="${index}" data-action-index="${actionIndex}" class="delete-action-button">Elimina Azione</button>
+                <button data-turn-index="${index}" data-action-index="${actionIndex}" class="manage-advantages-button">Gestisci Vantaggi/Svantaggi</button>
+            </article>
+        `).join('');
+    
         turnCard.innerHTML = `
             <h3>Turno ${index + 1}</h3>
-            <!--<button data-turn-index="${index}" class="edit-turn-button">Modifica Turno</button>-->
-            <!--<button data-turn-index="${index}" class="delete-turn-button">Elimina Turno</button>-->
-            <!-- ... --> 
-            <div>
-                ${turn.actions.map((action, actionIndex) => `
-                <article class="card action-card">
-                    <h4>${action.type === 'main' ? 'Azione Principale' : 'Azione del Leader'}</h4>
-                    <p><strong>Risultato:</strong> ${action.result}</p>
-                    <p><strong>Metodo:</strong> ${action.method}</p>
-                    <p><strong>Risorse:</strong> ${action.resources.join(', ')}</p>
-                    <button data-turn-index="${index}" data-action-index="${actionIndex}" class="edit-action-button">Modifica Azione</button>
-                    <button data-turn-index="${index}" data-action-index="${actionIndex}" class="delete-action-button">Elimina Azione</button>
-                    <button data-turn-index="${index}" data-action-index="${actionIndex}" class="manage-advantages-button">Gestisci Vantaggi/Svantaggi</button>
-                </article>
-            `).join('')}      
-            </div>
+            <div>${actionsHTML}</div>
             ${turn.actions.length < 2 ? `<button data-turn-index="${index}" class="add-action-button">Aggiungi Azione</button>` : ''}
         `;
+    
         turnsContainer.appendChild(turnCard);
     });
+    
 
     // Aggiungi event listener per i pulsanti
     const addActionButtons = document.querySelectorAll('.add-action-button');
@@ -509,15 +508,22 @@ function addTurn() {
 function addAction(event) {
     const turnIndex = event.target.dataset.turnIndex;
     currentTurn = currentFaction.turns[turnIndex];
-    actionForm.reset();
+
+    currentAction = null; // Indichiamo che stiamo aggiungendo una nuova azione
+    actionForm.reset(); // Resettiamo il form
     actionModal.showModal();
+
+    actionForm.dataset.turnIndex = turnIndex; // Impostiamo il turno corrente
+    actionForm.dataset.actionIndex = ''; // Nuova azione, quindi nessun indice
 }
+
 
 function saveAction(event) {
     event.preventDefault();
-    const turnIndex = actionForm.dataset.turnIndex;
-    const actionIndex = actionForm.dataset.actionIndex;
-    currentTurn = currentFaction.turns[turnIndex];
+
+    const turnIndex = actionForm.dataset.turnIndex; // Ottieni l'indice del turno
+    const actionIndex = actionForm.dataset.actionIndex; // Ottieni l'indice dell'azione
+    currentTurn = currentFaction.turns[turnIndex]; // Assicurati di lavorare con il turno corrente
 
     const type = document.getElementById('action-type').value;
     const result = document.getElementById('action-result').value;
@@ -534,18 +540,20 @@ function saveAction(event) {
         disadvantages: currentAction ? currentAction.disadvantages : []
     };
 
-    // if (actionIndex === '') {
-    //     // Aggiungi nuova azione
-    //     currentTurn.actions.push(actionData);
-    // } else {
-    //     // Modifica azione esistente
-    //     currentTurn.actions[actionIndex] = actionData;
-    // }
+    // Controlla se si tratta di una nuova azione o di una modifica
+    if (actionIndex === '') {
+        // Aggiungi una nuova azione
+        currentTurn.actions.push(actionData);
+    } else {
+        // Modifica l'azione esistente
+        currentTurn.actions[actionIndex] = actionData;
+    }
 
-    renderTurns();
-    actionModal.close();
-    saveFactions();
+    renderTurns(); // Aggiorna la visualizzazione
+    actionModal.close(); // Chiudi la modale
+    saveFactions(); // Salva i dati nel database
 }
+
 
 function deleteAction(event) {
     const turnIndex = event.target.dataset.turnIndex;
