@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>BLOC</title>
+    <!-- Include pico.css -->
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <!-- Il tuo file CSS personalizzato -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="container">
+        <h1 id="main-title">BLOC</h1>
+        
+        <!-- Sezione delle Sessioni Disponibili -->
+        <section id="sessions-section">
+            <h2>Sessioni Disponibili</h2>
+            <div id="sessions-container">
+                <!-- Le sessioni disponibili verranno inserite qui -->
+            </div>
+            <!-- Pulsante per creare una nuova sessione -->
+            <button id="create-session-button">Crea Nuova Sessione</button>
+        </section>    
+
+        <!-- Sezione delle Fazioni -->
+        <section id="factions-section" style="display: none;">
+            <!-- Pulsante per tornare alle sessioni -->
+            <button id="back-to-sessions-button">Torna alle Sessioni</button>
+            <!-- Titolo della sessione -->
+            <h2 id="session-title"></h2>
+            <h2>Fazioni</h2>
+            <div id="factions-container">
+                <!-- Le card delle fazioni verranno inserite qui -->
+            </div>
+            <!-- Pulsante per aggiungere una nuova fazione -->
+            <button id="add-faction-button">Aggiungi Fazione</button>
+            <!-- Pulsante per scaricare i dati della sessione -->
+            <button id="download-session-data-button">Scarica Dati Sessione</button>
+
+        </section>
+
+        <!-- Sezione dei Turni -->
+        <section id="turns-section" style="display: none;">
+            <button id="back-to-factions-button">← Torna alle Fazioni</button>
+            <h2 id="faction-title">Fazione</h2>
+            <div id="turns-container">
+                <!-- Le card dei turni verranno inserite qui -->
+            </div>
+            <!-- Pulsante per aggiungere un nuovo turno -->
+            <button id="add-turn-button">Aggiungi Turno</button>
+        </section>
+    </main>
+
+    <!-- Modale per inserire o modificare una fazione -->
+    <dialog id="faction-modal">
+        <article>
+            <h3 id="faction-modal-title">Nuova Fazione</h3>
+            <form id="faction-form">
+                <label for="faction-name">Nome Fazione:</label>
+                <input type="text" id="faction-name" name="faction-name" required>
+
+                <label for="faction-description">Descrizione:</label>
+                <textarea id="faction-description" name="faction-description" required></textarea>
+
+                <button type="submit">Salva</button>
+                <button type="button" id="close-faction-modal">Annulla</button>
+            </form>
+        </article>
+    </dialog>
+
+    <!-- Modale per inserire una nuova azione -->
+    <dialog id="action-modal">
+        <article>
+            <h3>Nuova Azione</h3>
+            <form id="action-form">
+                <label for="action-type">Tipo di Azione:</label>
+                <select id="action-type" name="action-type">
+                    <option value="main">Azione Principale</option>
+                    <option value="leader">Azione del Leader</option>
+                </select>
+
+                <label for="action-result">Risultato:</label>
+                <input type="text" id="action-result" name="action-result" required>
+
+                <label for="action-method">Metodo:</label>
+                <textarea id="action-method" name="action-method" required></textarea>
+
+                <label for="action-resources">Risorse (separate da virgola):</label>
+                <input type="text" id="action-resources" name="action-resources" required>
+
+                <button type="submit">Salva</button>
+                <button type="button" id="close-action-modal">Annulla</button>
+            </form>
+        </article>
+    </dialog>
+
+    <!-- Modale per gestire vantaggi e svantaggi -->
+    <dialog id="adv-disadv-modal">
+        <article>
+            <h3>Vantaggi e Svantaggi</h3>
+            <section id="advantages-section">
+                <h4>Vantaggi</h4>
+                <ul id="advantages-list">
+                    <!-- Vantaggi verranno inseriti qui -->
+                </ul>
+                <input type="text" id="advantage-input" placeholder="Inserisci un nuovo vantaggio">
+                <button id="add-advantage-button">Aggiungi Vantaggio</button>
+            </section>
+            <section id="disadvantages-section">
+                <h4>Svantaggi</h4>
+                <ul id="disadvantages-list">
+                    <!-- Svantaggi verranno inseriti qui -->
+                </ul>
+                <input type="text" id="disadvantage-input" placeholder="Inserisci un nuovo svantaggio">
+                <button id="add-disadvantage-button">Aggiungi Svantaggio</button>
+            </section>
+            <button type="button" id="close-adv-disadv-modal">Chiudi</button>
+        </article>
+    </dialog>
+
+    <!-- Modale per creare una nuova sessione -->
+    <dialog id="create-session-modal">
+        <article>
+            <h3>Crea Nuova Sessione</h3>
+            <form id="create-session-form">
+                <label for="new-session-title">Titolo della Sessione:</label>
+                <input type="text" id="new-session-title" name="session-title" required>
+                <button type="submit">Crea</button>
+                <button type="button" id="close-create-session-modal">Annulla</button>
+            </form>
+        </article>
+    </dialog>    
+
+    <!-- Modale per modificare un turno -->
+    <dialog id="turn-modal">
+        <article>
+            <h3 id="turn-modal-title">Modifica Turno</h3>
+            <form id="turn-form">
+                <label for="turn-name">Nome del Turno:</label>
+                <input type="text" id="turn-name" name="turn-name" required>
+
+                <button type="submit">Salva</button>
+                <button type="button" id="close-turn-modal">Annulla</button>
+            </form>
+        </article>
+    </dialog>
+
+    
+    <!-- Includi le librerie Firebase PRIMA di app.js -->
+    <!-- Firebase App (necessario) -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
+    <!-- Firebase Database (compatibilità) -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-database-compat.js"></script>
+
+
+    <!-- Il tuo script app.js -->
+    <script src="app.js"></script>
+
+</body>
+</html>

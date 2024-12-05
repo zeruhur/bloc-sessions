@@ -1,0 +1,23 @@
+/* Stili personalizzati */
+
+.turn {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.action {
+    border: 1px dashed #999;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.advantage {
+    color: green;
+    cursor: pointer;
+}
+
+.disadvantage {
+    color: red;
+    cursor: pointer;
+}
