@@ -675,9 +675,26 @@ function loadFactions() {
         // Se non c'è una sessione selezionata, mostra la lista delle sessioni
         sessionsSection.style.display = 'block';
         factionsSection.style.display = 'none';
-        loadSessions(); // Chiama loadSessions per caricare le sessioni disponibili
+        turnsSection.style.display = 'none';
+        loadSessions(); // Carica le sessioni disponibili
         return;
     }
+    // Nascondi la sezione delle sessioni e mostra la sezione delle fazioni
+    sessionsSection.style.display = 'none';
+    factionsSection.style.display = 'block';
+    turnsSection.style.display = 'none';
+
+    // Aggiorna il titolo della sessione
+    database.ref(`sessions/${sessionId}/title`).once('value')
+        .then(snapshot => {
+            const title = snapshot.val() || 'Sessione senza titolo';
+            document.getElementById('session-title').textContent = title;
+        })
+        .catch(error => {
+            console.error('Errore durante il caricamento del titolo della sessione:', error);
+            alert('Errore durante il caricamento del titolo della sessione: ' + error.message);
+        });
+
     // Carica le fazioni della sessione selezionata
     database.ref(`sessions/${sessionId}/factions`).on('value', snapshot => {
         const data = snapshot.val() || {};
@@ -688,6 +705,7 @@ function loadFactions() {
         alert('Errore durante il caricamento delle fazioni: ' + error.message);
     });
 }
+
 
 
 function saveFactions() {
